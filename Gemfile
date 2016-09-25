@@ -9,6 +9,7 @@ gem 'puma', '~> 3.0'
 gem 'rack-cors', require: 'rack/cors'
 gem 'faker', '~> 1.6'
 gem 'geocoder', '~> 1.4'
+gem 'rest-client', '~> 2.0'
 
 group :development, :test do
   gem 'listen', '~> 3.0.5'

@@ -43,4 +43,7 @@ DATABASE_URL
 #
 # Get a key from https://console.developers.google.com/flows/enableapi?apiid=geocoding_backend&keyType=SERVER_SIDE
 GOOGLE_MAPS_API_KEY
+
+# API key for Streak. Make sure it's an admin's key.
+STREAK_API_KEY
 ```
