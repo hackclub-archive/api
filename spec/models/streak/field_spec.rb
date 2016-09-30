@@ -3,6 +3,8 @@ require 'rails_helper'
 RSpec.describe Streak::Field, type: :model do
   subject { create(:streak_field) }
 
+  it { should belong_to :pipeline }
+
   it { should have_db_column :streak_key }
   it { should have_db_column :streak_pipeline_id }
   it { should have_db_column :name }
