@@ -61,7 +61,9 @@ RSpec.describe "V1::Streak::Pipelines", type: :request do
           fields: fields.map { |f|
             {
               name: f[:name],
-              key: f[:streak_key],
+              # Need to convert to string for the faked response because we
+              # store this as an integer internally
+              key: f[:streak_key].to_s,
               type: f[:field_type]
             }
           }
