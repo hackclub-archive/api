@@ -51,6 +51,7 @@ GEM
     concurrent-ruby (1.0.2)
     crack (0.4.3)
       safe_yaml (~> 1.0.0)
+    database_cleaner (1.5.3)
     diff-lcs (1.2.5)
     domain_name (0.5.20160826)
       unf (>= 0.0.5, < 1.0.0)
@@ -217,6 +218,7 @@ PLATFORMS
 DEPENDENCIES
   active_model_serializers (~> 0.10.0)
   byebug
+  database_cleaner (~> 1.5)
   dotenv-rails (~> 2.1)
   factory_girl_rails (~> 4.7)
   faker (~> 1.6)

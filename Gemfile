@@ -21,9 +21,11 @@ group :development, :test do
 
   gem 'dotenv-rails', '~> 2.1'
   gem 'byebug', platform: :mri
+
   gem 'rspec-rails', '~> 3.5'
   gem 'factory_girl_rails', '~> 4.7'
   gem 'webmock', '~> 2.1'
+  gem 'database_cleaner', '~> 1.5'
 
   gem 'shoulda-matchers', '~> 3.1'
 
