@@ -6,6 +6,8 @@ machine:
     - curl -sSL https://s3.amazonaws.com/circle-downloads/install-circleci-docker.sh | bash -s -- 1.10.0
   services:
     - docker
+  environment:
+    STREAK_API_KEY: test
 
 dependencies:
   pre:
@@ -30,4 +32,4 @@ database:
 
 test:
   override:
-    - PWD=$HOME/code docker-compose run web bundle exec rspec --color --require spec_helper spec --format progress
+    - PWD=$HOME/code docker-compose run -e STREAK_API_KEY web bundle exec rspec --color --require spec_helper spec --format progress
