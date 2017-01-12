@@ -6,7 +6,6 @@ Rails.application.routes.draw do
     post 'cloud9/send_invite'
 
     resources :clubs
-    resources :tech_domain_redemptions, only: [:create]
 
     namespace :hackbot do
       post 'auth', to: 'auth#create'
