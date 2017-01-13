@@ -1,0 +1,268 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://c9.io/auth/login
+    body:
+      encoding: UTF-8
+      string: '{"username":"ENV-cloud9_username","password":"ENV-cloud9_password"}'
+    headers:
+      Accept:
+      - "*/*"
+      Accept-Encoding:
+      - gzip, deflate
+      User-Agent:
+      - rest-client/2.0.0 (linux-gnu x86_64) ruby/2.3.1p112
+      Origin:
+      - https://c9.io
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '64'
+      Host:
+      - c9.io
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      X-Frame-Options:
+      - DENY
+      Set-Cookie:
+      - c9.live.proxy=<CLOUD9_LIVE_PROXY_COOKIE>; Domain=.c9.io; Path=/; Expires=Fri,
+        20 Jan 2017 23:45:16 GMT; HttpOnly
+      - c9.live.proxy=<CLOUD9_LIVE_PROXY_COOKIE_2>; Domain=.c9.io; Path=/; Expires=Fri,
+        20 Jan 2017 23:45:17 GMT; HttpOnly
+      - c9.live=<CLOUD9_LIVE_COOKIE>; Path=/; Expires=Fri, 20 Jan 2017 23:45:17 GMT;
+        HttpOnly; Secure
+      Content-Type:
+      - application/json
+      Access-Control-Allow-Origin:
+      - "*"
+      Access-Control-Allow-Methods:
+      - GET, OPTIONS, PUT, POST, DELETE, HEAD, PROPFIND, PATCH
+      Access-Control-Allow-Headers:
+      - Content-Type, X-Requested-With, x-request-metadata
+      Access-Control-Expose-Headers:
+      - x-content-length, x-metadata-length
+      Access-Control-Max-Age:
+      - '8640000'
+      Date:
+      - Fri, 13 Jan 2017 23:45:17 GMT
+      Transfer-Encoding:
+      - chunked
+      Content-Encoding:
+      - gzip
+      X-Backend:
+      - oldclient
+      Strict-Transport-Security:
+      - max-age=31536000
+    body:
+      encoding: ASCII-8BIT
+      string: !binary |-
+        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
+    http_version: 
+  recorded_at: Fri, 13 Jan 2017 23:45:17 GMT
+- request:
+    method: get
+    uri: https://c9.io/api/nc/auth?client_id=profile_direct&immediate=1&login_hint&responseType=direct
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept:
+      - "*/*"
+      Accept-Encoding:
+      - gzip, deflate
+      User-Agent:
+      - rest-client/2.0.0 (linux-gnu x86_64) ruby/2.3.1p112
+      Cookie:
+      - c9.live=<CLOUD9_LIVE_COOKIE>; c9.live.proxy=<CLOUD9_LIVE_PROXY_COOKIE>
+      Host:
+      - c9.io
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      X-Frame-Options:
+      - DENY
+      Set-Cookie:
+      - c9.live.proxy=<CLOUD9_LIVE_PROXY_COOKIE>; Domain=.c9.io; Path=/; Expires=Fri,
+        20 Jan 2017 23:45:17 GMT; HttpOnly
+      - c9.live=<CLOUD9_LIVE_COOKIE>; Path=/; Expires=Fri, 20 Jan 2017 23:45:17 GMT;
+        HttpOnly; Secure
+      Content-Type:
+      - text/plain
+      Access-Control-Allow-Origin:
+      - "*"
+      Access-Control-Allow-Methods:
+      - GET, OPTIONS, PUT, POST, DELETE, HEAD, PROPFIND, PATCH
+      Access-Control-Allow-Headers:
+      - Content-Type, X-Requested-With, x-request-metadata
+      Access-Control-Expose-Headers:
+      - x-content-length, x-metadata-length
+      Access-Control-Max-Age:
+      - '8640000'
+      Date:
+      - Fri, 13 Jan 2017 23:45:17 GMT
+      Transfer-Encoding:
+      - chunked
+      Content-Encoding:
+      - gzip
+      X-Backend:
+      - oldclient
+      Strict-Transport-Security:
+      - max-age=31536000
+    body:
+      encoding: ASCII-8BIT
+      string: !binary |-
+        H4sIAAAAAAAEA7NM9o2M8HVyKa20NHDKMSg2TstLBwAoH8lvFAAAAA==
+    http_version: 
+  recorded_at: Fri, 13 Jan 2017 23:45:17 GMT
+- request:
+    method: post
+    uri: https://api.c9.io/user/org/ENV-cloud9_team_name/invite?access_token=<CLOUD9_ACCESS_TOKEN>
+    body:
+      encoding: UTF-8
+      string: '{"email":null}'
+    headers:
+      Accept:
+      - application/json
+      Accept-Encoding:
+      - gzip, deflate
+      User-Agent:
+      - rest-client/2.0.0 (linux-gnu x86_64) ruby/2.3.1p112
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '14'
+      Host:
+      - api.c9.io
+  response:
+    status:
+      code: 422
+      message: Unprocessable Entity
+    headers:
+      Content-Type:
+      - application/json
+      Access-Control-Allow-Origin:
+      - "*"
+      Access-Control-Allow-Methods:
+      - GET, OPTIONS, PUT, POST, DELETE, HEAD, PROPFIND, PATCH
+      Access-Control-Allow-Headers:
+      - Content-Type, X-Requested-With, x-request-metadata
+      Access-Control-Expose-Headers:
+      - x-content-length, x-metadata-length
+      Access-Control-Max-Age:
+      - '8640000'
+      Date:
+      - Fri, 13 Jan 2017 23:45:17 GMT
+      Transfer-Encoding:
+      - chunked
+      X-Backend:
+      - api
+      Strict-Transport-Security:
+      - max-age=31536000
+    body:
+      encoding: UTF-8
+      string: '{"error":{"code":422,"hostname":"newclient-gce-usw-150-prod","scope":"api","message":"Validation
+        failed","errors":[{"resource":"root","field":"email","type_expected":"string","code":"invalid"}]}}'
+    http_version: 
+  recorded_at: Fri, 13 Jan 2017 23:45:18 GMT
+recorded_with: VCR 3.0.3
