@@ -28,9 +28,9 @@ RSpec.describe 'V1::Cloud9', type: :request, vcr: true do
       before { post '/v1/cloud9/send_invite', params: { email: email } }
 
       it 'errors' do
-        expect(response).to have_http_status(409)
+        expect(response).to have_http_status(422)
         expect(json['errors']['email'])
-          .to eq('Invite already sent for this email')
+          .to include('has already been taken')
       end
     end
 
@@ -39,7 +39,7 @@ RSpec.describe 'V1::Cloud9', type: :request, vcr: true do
 
       it 'errors' do
         expect(response).to have_http_status(422)
-        expect(json['errors']['email']).to eq('Must be a valid email')
+        expect(json['errors']['email']).to include('is not an email')
       end
     end
   end
