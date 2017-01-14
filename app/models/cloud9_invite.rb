@@ -1,7 +1,5 @@
 class Cloud9Invite < ApplicationRecord
-  validates :email, presence: true
-  validates :email, uniqueness: true
-  validates :email, email: true
+  validates :email, presence: true, uniqueness: true, email: true
 
   before_create :invite_member
 
@@ -10,7 +8,7 @@ class Cloud9Invite < ApplicationRecord
       Rails.application.secrets.cloud9_team_name,
       email
     )
-  rescue
-    errors.add(:invite_member_error, 'Couldn\'t invite member')
+  rescue RestClient::Conflict
+    errors.add(:send_invite, "Couldn't invite member")
   end
 end
