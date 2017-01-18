@@ -11,7 +11,10 @@ module Hackbot
       end
 
       def start(event)
-        first_name = leader(event).name.split(' ').first
+        info = leader(event)
+        data['slack_username'] = info.slack_username
+
+        first_name = info.name.split(' ').first
 
         msg_channel "Hey #{first_name}! Did you have a club meeting this week?"
 
@@ -20,6 +23,8 @@ module Hackbot
 
       # rubocop:disable Metrics/MethodLength
       def wait_for_meeting_confirmation(event)
+        prompt_reply
+
         case event[:text]
         when /(yes|yeah|yup|mmhm|affirmative)/i
           msg_channel 'Okay, sweet! On which day was it? (say something '\
@@ -41,6 +46,8 @@ module Hackbot
 
       # rubocop:disable Metrics/MethodLength
       def wait_for_day_of_week(event)
+        prompt_reply
+
         meeting_date = Chronic.parse(event[:text], context: :past)
 
         unless meeting_date
@@ -72,6 +79,8 @@ module Hackbot
 
       # rubocop:disable Metrics/CyclomaticComplexity, Metrics/MethodLength
       def wait_for_attendance(event)
+        prompt_reply
+
         unless integer?(event[:text])
           msg_channel "I didn't quite understand that. Can you try giving me "\
                       'a single number?'
@@ -113,6 +122,8 @@ module Hackbot
       # rubocop:enable Metrics/CyclomaticComplexity, Metrics/MethodLength
 
       def wait_for_notes(event)
+        prompt_reply
+
         data['notes'] = event[:text] unless event[:text] =~ /^(no|nope|nah)$/i
 
         ::CheckIn.create!(
@@ -125,6 +136,22 @@ module Hackbot
 
         msg_channel "Sweet, I'll let them know! Hope you have a hack-tastic "\
                     'weekend!'
+      end
+
+      def handle(event)
+        data['last_message_ts'] = time
+
+        super
+      end
+
+      DEFAULT_PROMPT_WAIT_TIME = 10.seconds
+
+      def prompt_reply
+        prompt_reply_in DEFAULT_PROMPT_WAIT_TIME
+      end
+
+      def prompt_reply_in(amount)
+        SlackPromptReplyJob.set(wait: amount).perform_later(data['slack_username'], id, time)
       end
 
       private
@@ -154,6 +181,10 @@ module Hackbot
         resp = SlackClient::Users.info(user_id, access_token)
 
         resp[:user]
+      end
+
+      def time
+        Time.now.to_i
       end
     end
     # rubocop:enable Metrics/ClassLength
