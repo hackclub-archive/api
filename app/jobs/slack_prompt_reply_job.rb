@@ -10,26 +10,30 @@ class SlackPromptReplyJob < ApplicationJob
 
   MESSAGE_PROMPT_TEXT = "LISTEN HERE LADDY/LADDESS. YOU SIR/MA'AM ARE G'NNA RESPOND TO THIS HERE SL'CK MESSAGE."
 
-  def perform(username, conversation_id, job_queued_time)
+  def perform(slack_id, conversation_id, job_queued_time)
     convo = Hackbot::Conversations::CheckIn.find(conversation_id)
 
-    if convo.data['last_message_ts'] > job_queued_time 
-      puts 'Message has been replied to in an adequate amount of time'
+    if convo.data['last_message_ts'].nil?
+      send_prompt slack_id
       return
+    else
+      if convo.data['last_message_ts'].to_time > job_queued_time.to_time
+        puts 'Message has been replied to in an adequate amount of time'
+      else
+        send_prompt slack_id
+      end
     end
+  end
 
-    byebug
+  private
 
-    user = user_from_username(username)
-
+  def send_prompt(slack_id)
     SlackClient.rpc('chat.postMessage', access_token, {
-      channel: user[:id],
+      channel: slack_id,
       text: MESSAGE_PROMPT_TEXT,
       as_user: true
     })
   end
-
-  private
 
   # This constructs a fake Slack event to start the conversation with. It'll be
   # sent to the conversation's start method.

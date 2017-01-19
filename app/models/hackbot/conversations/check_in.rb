@@ -5,31 +5,30 @@
 module Hackbot
   module Conversations
     # rubocop:disable Metrics/ClassLength
-    class CheckIn < Hackbot::Conversations::Channel
+    class CheckIn < Hackbot::Conversations::Followupable
       def self.should_start?(event, _team)
         event[:text] == 'check in'
       end
 
       def start(event)
         info = leader(event)
-        data['slack_username'] = info.slack_username
-
         first_name = info.name.split(' ').first
 
         msg_channel "Hey #{first_name}! Did you have a club meeting this week?"
+
+        prompt_reply
 
         :wait_for_meeting_confirmation
       end
 
       # rubocop:disable Metrics/MethodLength
       def wait_for_meeting_confirmation(event)
-        prompt_reply
-
         case event[:text]
         when /(yes|yeah|yup|mmhm|affirmative)/i
           msg_channel 'Okay, sweet! On which day was it? (say something '\
                       'like "monday" or "today")'
 
+          prompt_reply
           :wait_for_day_of_week
         when /(no|nope|nah|negative)/i
           msg_channel 'Gotcha! Hope you have a great weekend.'
@@ -39,22 +38,22 @@ module Hackbot
           msg_channel "I'm not very smart yet and had trouble understanding "\
                       'you :-/. Try saying something like "yes" or "no".'
 
+          prompt_reply
           :wait_for_meeting_confirmation
         end
+
       end
       # rubocop:enable Metrics/MethodLength
 
       # rubocop:disable Metrics/MethodLength
       def wait_for_day_of_week(event)
-        prompt_reply
-
         meeting_date = Chronic.parse(event[:text], context: :past)
 
         unless meeting_date
           msg_channel "Man, I'm not very smart yet and had trouble "\
                       'understanding you. Try saying something simpler, like '\
                       '"tuesday" or "thursday".'
-
+          prompt_reply
           return :wait_for_day_of_week
         end
 
@@ -63,7 +62,7 @@ module Hackbot
                       'week (though I may also be misunderstanding you). Can '\
                       'you try giving me the day of the week of your last '\
                       'meeting again?'
-
+          prompt_reply
           return :wait_for_day_of_week
         end
 
@@ -73,18 +72,19 @@ module Hackbot
                     "smart, I'll need you to give me a single number, "\
                     'something like "25" – give your best estimate)'
 
+        prompt_reply
         :wait_for_attendance
       end
       # rubocop:enable Metrics/MethodLength
 
       # rubocop:disable Metrics/CyclomaticComplexity, Metrics/MethodLength
       def wait_for_attendance(event)
-        prompt_reply
 
         unless integer?(event[:text])
           msg_channel "I didn't quite understand that. Can you try giving me "\
                       'a single number?'
 
+          prompt_reply
           return :wait_for_attendance
         end
 
@@ -94,6 +94,7 @@ module Hackbot
           msg_channel "I'm going to need a positive number, silly. How many "\
                       'people came to the last meeting?'
 
+          prompt_reply
           return :wait_for_attendance
         end
 
@@ -117,13 +118,12 @@ module Hackbot
                     '(just make sure to include everything in a single '\
                     'message).'
 
+        prompt_reply
         :wait_for_notes
       end
       # rubocop:enable Metrics/CyclomaticComplexity, Metrics/MethodLength
 
       def wait_for_notes(event)
-        prompt_reply
-
         data['notes'] = event[:text] unless event[:text] =~ /^(no|nope|nah)$/i
 
         ::CheckIn.create!(
@@ -136,22 +136,8 @@ module Hackbot
 
         msg_channel "Sweet, I'll let them know! Hope you have a hack-tastic "\
                     'weekend!'
-      end
 
-      def handle(event)
-        data['last_message_ts'] = time
-
-        super
-      end
-
-      DEFAULT_PROMPT_WAIT_TIME = 10.seconds
-
-      def prompt_reply
-        prompt_reply_in DEFAULT_PROMPT_WAIT_TIME
-      end
-
-      def prompt_reply_in(amount)
-        SlackPromptReplyJob.set(wait: amount).perform_later(data['slack_username'], id, time)
+        :finish
       end
 
       private
@@ -181,10 +167,6 @@ module Hackbot
         resp = SlackClient::Users.info(user_id, access_token)
 
         resp[:user]
-      end
-
-      def time
-        Time.now.to_i
       end
     end
     # rubocop:enable Metrics/ClassLength
