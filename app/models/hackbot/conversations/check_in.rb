@@ -10,13 +10,24 @@ module Hackbot
         event[:text] == 'check in'
       end
 
+      # rubocop:disable Metrics/LineLength, Metrics/MethodLength
       def start(event)
-        first_name = leader(event).name.split(' ').first
+        leader_info = leader(event)
+        first_name = leader_info.name.split(' ').first
 
-        msg_channel "Hey #{first_name}! Did you have a club meeting this week?"
+        if ::CheckIn.where(leader_id: leader_info.id).length.zero?
+          msg_channel "Hi #{first_name}! I'm Hackbot - Hack Club's friendly robotic helper. "\
+            "Right now I'm reaching out to you so I can collect some data about your club's "\
+            'activity in the past week so that the team can improve your experience working '\
+            'with them :) '\
+            'So, first question: Did you have a club meeting this week?'
+        else
+          msg_channel "Hey #{first_name}! Did you have a club meeting this week?"
+        end
 
         :wait_for_meeting_confirmation
       end
+      # rubocop:enable Metrics/LineLength, Metrics/MethodLength
 
       # rubocop:disable Metrics/MethodLength
       def wait_for_meeting_confirmation(event)
