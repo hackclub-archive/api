@@ -41,7 +41,6 @@ module Hackbot
           prompt_reply
           :wait_for_meeting_confirmation
         end
-
       end
       # rubocop:enable Metrics/MethodLength
 
@@ -79,7 +78,6 @@ module Hackbot
 
       # rubocop:disable Metrics/CyclomaticComplexity, Metrics/MethodLength
       def wait_for_attendance(event)
-
         unless integer?(event[:text])
           msg_channel "I didn't quite understand that. Can you try giving me "\
                       'a single number?'
@@ -125,7 +123,6 @@ module Hackbot
 
       def wait_for_notes(event)
         data['notes'] = event[:text] unless event[:text] =~ /^(no|nope|nah)$/i
-
         ::CheckIn.create!(
           club: club(event),
           leader: leader(event),

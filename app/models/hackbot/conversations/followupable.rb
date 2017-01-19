@@ -19,7 +19,12 @@ module Hackbot
       end
 
       def prompt_reply_in(amount)
-        SlackPromptReplyJob.set(wait: amount).perform_later(data['slack_id'], id, timestamp)
+        SlackPromptReplyJob.set(
+          wait: amount
+        ).perform_later(
+          data['slack_id'],
+          id, timestamp
+        )
       end
 
       private

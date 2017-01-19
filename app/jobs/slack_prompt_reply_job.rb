@@ -1,6 +1,6 @@
 # 1. Checks if a message has been sent since the job was queued
 # 2. If it has, kill the job. If not then continue
-# 3. Send a message prompting a response from the userc:w
+# 3. Send a message prompting a response from the user
 # 4. Queue the job again (Back to step 1.)
 
 class SlackPromptReplyJob < ApplicationJob
@@ -8,31 +8,27 @@ class SlackPromptReplyJob < ApplicationJob
 
   HACK_CLUB_TEAM_ID = 'T0266FRGM'.freeze
 
-  MESSAGE_PROMPT_TEXT = "LISTEN HERE LADDY/LADDESS. YOU SIR/MA'AM ARE G'NNA RESPOND TO THIS HERE SL'CK MESSAGE."
+  MESSAGE_PROMPT_TEXT = 'Ping! Would you mind responding to my previous'\
+    'message?'.freeze
 
   def perform(slack_id, conversation_id, job_queued_time)
     convo = Hackbot::Conversations::CheckIn.find(conversation_id)
 
     if convo.data['last_message_ts'].nil?
       send_prompt slack_id
-      return
-    else
-      if convo.data['last_message_ts'].to_time > job_queued_time.to_time
-        puts 'Message has been replied to in an adequate amount of time'
-      else
-        send_prompt slack_id
-      end
+    elsif convo.data['last_message_ts'].to_time < job_queued_time.to_time
+      send_prompt slack_id
     end
   end
 
   private
 
   def send_prompt(slack_id)
-    SlackClient.rpc('chat.postMessage', access_token, {
-      channel: slack_id,
-      text: MESSAGE_PROMPT_TEXT,
-      as_user: true
-    })
+    SlackClient.rpc('chat.postMessage',
+                    access_token,
+                    channel: slack_id,
+                    text: MESSAGE_PROMPT_TEXT,
+                    as_user: true)
   end
 
   # This constructs a fake Slack event to start the conversation with. It'll be
@@ -59,9 +55,9 @@ class SlackPromptReplyJob < ApplicationJob
     @all_users.find { |u| u[:name] == username }
   end
 
-   def access_token
+  def access_token
     slack_team.bot_access_token
-   end
+  end
 
   def slack_team
     Hackbot::Team.find_by(team_id: HACK_CLUB_TEAM_ID)
