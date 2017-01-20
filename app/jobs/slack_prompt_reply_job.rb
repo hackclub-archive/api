@@ -11,7 +11,7 @@ class SlackPromptReplyJob < ApplicationJob
   MESSAGE_PROMPT_TEXT = 'Ping! Would you mind responding to my previous'\
     'message?'.freeze
 
-  def perform(slack_id, conversation_id, job_queued_time)
+  def perform(message, slack_id, conversation_id, job_queued_time)
     convo = Hackbot::Conversations::CheckIn.find(conversation_id)
 
     if convo.data['last_message_ts'].nil?
