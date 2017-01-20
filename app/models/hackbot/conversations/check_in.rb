@@ -40,6 +40,10 @@ module Hackbot
         when /(no|nope|nah|negative)/i
           msg_channel 'Gotcha! Hope you have a great weekend.'
 
+          ::CheckIn.create!(
+            failed_to_happen: "no meeting"
+          )
+
           :finish
         else
           msg_channel "I'm not very smart yet and had trouble understanding "\
