@@ -5,15 +5,18 @@
 module Hackbot
   module Conversations
     # rubocop:disable Metrics/ClassLength
-    class CheckIn < Hackbot::Conversations::Channel
+    class CheckIn < Hackbot::Conversations::Followupable
       def self.should_start?(event, _team)
         event[:text] == 'check in'
       end
 
       def start(event)
-        first_name = leader(event).name.split(' ').first
+        info = leader(event)
+        first_name = info.name.split(' ').first
 
         msg_channel "Hey #{first_name}! Did you have a club meeting this week?"
+
+        prompt_reply
 
         :wait_for_meeting_confirmation
       end
@@ -25,6 +28,7 @@ module Hackbot
           msg_channel 'Okay, sweet! On which day was it? (say something '\
                       'like "monday" or "today")'
 
+          prompt_reply
           :wait_for_day_of_week
         when /(no|nope|nah|negative)/i
           msg_channel 'Gotcha! Hope you have a great weekend.'
@@ -34,6 +38,7 @@ module Hackbot
           msg_channel "I'm not very smart yet and had trouble understanding "\
                       'you :-/. Try saying something like "yes" or "no".'
 
+          prompt_reply
           :wait_for_meeting_confirmation
         end
       end
@@ -47,7 +52,7 @@ module Hackbot
           msg_channel "Man, I'm not very smart yet and had trouble "\
                       'understanding you. Try saying something simpler, like '\
                       '"tuesday" or "thursday".'
-
+          prompt_reply
           return :wait_for_day_of_week
         end
 
@@ -56,7 +61,7 @@ module Hackbot
                       'week (though I may also be misunderstanding you). Can '\
                       'you try giving me the day of the week of your last '\
                       'meeting again?'
-
+          prompt_reply
           return :wait_for_day_of_week
         end
 
@@ -66,6 +71,7 @@ module Hackbot
                     "smart, I'll need you to give me a single number, "\
                     'something like "25" – give your best estimate)'
 
+        prompt_reply
         :wait_for_attendance
       end
       # rubocop:enable Metrics/MethodLength
@@ -76,6 +82,7 @@ module Hackbot
           msg_channel "I didn't quite understand that. Can you try giving me "\
                       'a single number?'
 
+          prompt_reply
           return :wait_for_attendance
         end
 
@@ -85,6 +92,7 @@ module Hackbot
           msg_channel "I'm going to need a positive number, silly. How many "\
                       'people came to the last meeting?'
 
+          prompt_reply
           return :wait_for_attendance
         end
 
@@ -108,13 +116,13 @@ module Hackbot
                     '(just make sure to include everything in a single '\
                     'message). If not, please just respond with "no".'
 
+        prompt_reply
         :wait_for_notes
       end
       # rubocop:enable Metrics/CyclomaticComplexity, Metrics/MethodLength
 
       def wait_for_notes(event)
         data['notes'] = event[:text] unless event[:text] =~ /^(no|nope|nah)$/i
-
         ::CheckIn.create!(
           club: club(event),
           leader: leader(event),
@@ -125,6 +133,8 @@ module Hackbot
 
         msg_channel "Sweet, I'll let them know! Hope you have a hack-tastic "\
                     'weekend!'
+
+        :finish
       end
 
       private
