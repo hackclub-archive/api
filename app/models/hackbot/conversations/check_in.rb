@@ -4,8 +4,8 @@
 # See https://github.com/hackclub/api/issues/25.
 module Hackbot
   module Conversations
-    POSITIVE=/(yes|yeah|yup|mmhm|affirmative)/i
-    NEGATIVE=/(no|nope|nah|negative)/i
+    POSITIVE = /(yes|yeah|yup|mmhm|affirmative)/i
+    NEGATIVE = /(no|nope|nah|negative)/i
 
     # rubocop:disable Metrics/ClassLength
     class CheckIn < Hackbot::Conversations::Channel
@@ -15,8 +15,8 @@ module Hackbot
 
       def start(event)
         if ask_if_poc event
-          msg_channel "Before we start, I just want to ask if you would like to "\
-                      "be the main point of contact for your club?"
+          msg_channel 'Before we start, I just want to ask if you would like '\
+                      'to be the main point of contact for your club?'
 
           return :determine_poc
         end
@@ -28,6 +28,7 @@ module Hackbot
         :wait_for_meeting_confirmation
       end
 
+      # rubocop:disable Metrics/MethodLength
       def determine_poc(event)
         case event[:text]
         when POSITIVE
@@ -40,7 +41,8 @@ module Hackbot
 
           start(event)
         when NEGATIVE
-          msg_channel "Gotcha! I'll be in touch with another one of your co-leaders then :)"
+          msg_channel "Gotcha! I'll be in touch with another one of your "\
+                      'co-leaders then :)'
 
           :finish
         else
@@ -50,6 +52,7 @@ module Hackbot
           :determine_poc
         end
       end
+      # rubocop:enable Metrics/MethodLength
 
       # rubocop:disable Metrics/MethodLength
       def wait_for_meeting_confirmation(event)
@@ -163,7 +166,10 @@ module Hackbot
       private
 
       def ask_if_poc(event)
-        MainPointOfContact.where(club: club(event).id, leader: leader(event)).first.nil?
+        MainPointOfContact.find_by(
+          club: club(event),
+          leader: leader(event)
+        ).nil?
       end
 
       def integer?(str)
