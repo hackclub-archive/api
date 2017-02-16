@@ -4,29 +4,74 @@
 # See https://github.com/hackclub/api/issues/25.
 module Hackbot
   module Conversations
+    POSITIVE = /(yes|yeah|yup|mmhm|affirmative)/i
+    NEGATIVE = /(no|nope|nah|negative)/i
+
     # rubocop:disable Metrics/ClassLength
     class CheckIn < Hackbot::Conversations::Channel
       def self.should_start?(event, _team)
         event[:text] == 'check in'
       end
 
+      # rubocop:disable Metrics/MethodLength
       def start(event)
-        first_name = leader(event).name.split(' ').first
+        if data['asked_if_poc'].nil?
+          first_name = leader(event).name.split(' ').first
+          msg_channel "Hey #{first_name}!"
+        end
 
-        msg_channel "Hey #{first_name}! Did you have a club meeting this week?"
+        if ask_if_poc event
+          msg_channel "Before we start, I'd just like to check if you want "\
+                      "to be your club's main point of contact. This means "\
+                      "that you'll be responsible for responding to me at the "\
+                      'end of each week.'
+
+          return :determine_poc
+        end
+
+        msg_channel 'Did you have a club meeting this week?'
 
         :wait_for_meeting_confirmation
       end
+      # rubocop:enable Metrics/MethodLength
+
+      # rubocop:disable Metrics/MethodLength
+      def determine_poc(event)
+        data['asked_if_poc'] = true
+
+        case event[:text]
+        when POSITIVE
+          msg_channel "Awesome! Let's keep going then!"
+
+          MainPointOfContact.create(
+            leader: leader(event),
+            club: club(event)
+          )
+
+          start(event)
+        when NEGATIVE
+          msg_channel "Gotcha! I'll be in touch with another one of your "\
+                      'co-leaders then :)'
+
+          :finish
+        else
+          msg_channel "I'm not very smart yet and had trouble understanding "\
+                      'you :-/. Try saying something like "yes" or "no".'
+
+          :determine_poc
+        end
+      end
+      # rubocop:enable Metrics/MethodLength
 
       # rubocop:disable Metrics/MethodLength
       def wait_for_meeting_confirmation(event)
         case event[:text]
-        when /(yes|yeah|yup|mmhm|affirmative)/i
+        when POSITIVE
           msg_channel 'Okay, sweet! On which day was it? (say something '\
                       'like "monday" or "today")'
 
           :wait_for_day_of_week
-        when /(no|nope|nah|negative)/i
+        when NEGATIVE
           msg_channel 'Gotcha! Hope you have a great weekend.'
 
           :finish
@@ -128,6 +173,13 @@ module Hackbot
       end
 
       private
+
+      def ask_if_poc(event)
+        MainPointOfContact.find_by(
+          club: club(event),
+          leader: leader(event)
+        ).nil?
+      end
 
       def integer?(str)
         Integer(str) && true
