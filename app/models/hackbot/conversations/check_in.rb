@@ -4,6 +4,9 @@
 # See https://github.com/hackclub/api/issues/25.
 module Hackbot
   module Conversations
+    POSITIVE=/(yes|yeah|yup|mmhm|affirmative)/i
+    NEGATIVE=/(no|nope|nah|negative)/i
+
     # rubocop:disable Metrics/ClassLength
     class CheckIn < Hackbot::Conversations::Channel
       def self.should_start?(event, _team)
@@ -11,6 +14,13 @@ module Hackbot
       end
 
       def start(event)
+        if ask_if_poc event
+          msg_channel "Before we start, I just want to ask if you would like to "\
+                      "be the main point of contact for your club?"
+
+          return :determine_poc
+        end
+
         first_name = leader(event).name.split(' ').first
 
         msg_channel "Hey #{first_name}! Did you have a club meeting this week?"
@@ -18,15 +28,38 @@ module Hackbot
         :wait_for_meeting_confirmation
       end
 
+      def determine_poc(event)
+        case event[:text]
+        when POSITIVE
+          msg_channel "Awesome! Let's keep going then!"
+
+          MainPointOfContact.create(
+            leader: leader(event),
+            club: club(event)
+          )
+
+          start(event)
+        when NEGATIVE
+          msg_channel "Gotcha! I'll be in touch with another one of your co-leaders then :)"
+
+          :finish
+        else
+          msg_channel "I'm not very smart yet and had trouble understanding "\
+                      'you :-/. Try saying something like "yes" or "no".'
+
+          :determine_poc
+        end
+      end
+
       # rubocop:disable Metrics/MethodLength
       def wait_for_meeting_confirmation(event)
         case event[:text]
-        when /(yes|yeah|yup|mmhm|affirmative)/i
+        when POSITIVE
           msg_channel 'Okay, sweet! On which day was it? (say something '\
                       'like "monday" or "today")'
 
           :wait_for_day_of_week
-        when /(no|nope|nah|negative)/i
+        when NEGATIVE
           msg_channel 'Gotcha! Hope you have a great weekend.'
 
           :finish
@@ -128,6 +161,10 @@ module Hackbot
       end
 
       private
+
+      def ask_if_poc(event)
+        MainPointOfContact.where(club: club(event).id, leader: leader(event)).first.nil?
+      end
 
       def integer?(str)
         Integer(str) && true
