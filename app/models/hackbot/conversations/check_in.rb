@@ -21,8 +21,10 @@ module Hackbot
         end
 
         if ask_if_poc event
-          msg_channel 'Before we start, I just want to ask if you would like '\
-                      'to be the main point of contact for your club?'
+          msg_channel "Before we start, I'd just like to check if you want "\
+                      "to be your club's main point of contact. This means "\
+                      "that you'll be responsible for responding to me at the "\
+                      'end of each week.'
 
           return :determine_poc
         end
