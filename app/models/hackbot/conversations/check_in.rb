@@ -41,7 +41,7 @@ module Hackbot
           msg_channel 'Gotcha! Hope you have a great weekend.'
 
           ::CheckIn.create!(
-            failed_to_happen: "no meeting"
+            failed_to_happen: 'no meeting'
           )
 
           :finish

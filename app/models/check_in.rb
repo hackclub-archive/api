@@ -2,6 +2,6 @@ class CheckIn < ApplicationRecord
   belongs_to :club
   belongs_to :leader
 
-  validates :club, :leader, :meeting_date, :attendance, presence: true,
-    if: "failed_to_happen.nil?"
+  validates :club, :leader, :meeting_date, :attendance,
+            presence: true, if: 'failed_to_happen.nil?'
 end
