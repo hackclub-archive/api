@@ -47,10 +47,9 @@ class LeaderCheckInsJob < ApplicationJob
   end
 
   def active_leader_usernames
-    ['harrison']
-    # active_leaders
-    #  .map(&:slack_username)
-    #  .reject { |u| u.nil? || u.empty? }
+    active_leaders
+     .map(&:slack_username)
+     .reject { |u| u.nil? || u.empty? }
   end
 
   def active_leaders
