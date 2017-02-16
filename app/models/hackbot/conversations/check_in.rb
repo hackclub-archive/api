@@ -13,7 +13,13 @@ module Hackbot
         event[:text] == 'check in'
       end
 
+      # rubocop:disable Metrics/MethodLength
       def start(event)
+        if data['asked_if_poc'].nil?
+          first_name = leader(event).name.split(' ').first
+          msg_channel "Hey #{first_name}!"
+        end
+
         if ask_if_poc event
           msg_channel 'Before we start, I just want to ask if you would like '\
                       'to be the main point of contact for your club?'
@@ -21,15 +27,16 @@ module Hackbot
           return :determine_poc
         end
 
-        first_name = leader(event).name.split(' ').first
-
-        msg_channel "Hey #{first_name}! Did you have a club meeting this week?"
+        msg_channel "Did you have a club meeting this week?"
 
         :wait_for_meeting_confirmation
       end
+      # rubocop:enable Metrics/MethodLength
 
       # rubocop:disable Metrics/MethodLength
       def determine_poc(event)
+        data['asked_if_poc'] = true
+
         case event[:text]
         when POSITIVE
           msg_channel "Awesome! Let's keep going then!"
