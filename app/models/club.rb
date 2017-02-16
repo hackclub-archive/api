@@ -31,6 +31,7 @@ class Club < ApplicationRecord
                 longitude: :longitude
 
   has_and_belongs_to_many :leaders
+  has_many :main_point_of_contact
   has_many :check_ins
 
   validates :name, presence: true
