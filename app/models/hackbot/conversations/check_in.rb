@@ -29,7 +29,7 @@ module Hackbot
           return :determine_poc
         end
 
-        msg_channel "Did you have a club meeting this week?"
+        msg_channel 'Did you have a club meeting this week?'
 
         :wait_for_meeting_confirmation
       end
