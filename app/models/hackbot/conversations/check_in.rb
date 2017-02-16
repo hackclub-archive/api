@@ -15,7 +15,7 @@ module Hackbot
         leader_info = leader(event)
         first_name = leader_info.name.split(' ').first
 
-        if ::CheckIn.where(leader_id: leader_info.id).length.zero?
+        if first_check_in?
           msg_channel "Hi #{first_name}! I'm Hackbot - Hack Club's friendly robotic helper. "\
             "Right now I'm reaching out to you so I can collect some data about your club's "\
             'activity in the past week so that the team can improve your experience working '\
@@ -39,10 +39,6 @@ module Hackbot
           :wait_for_day_of_week
         when /(no|nope|nah|negative)/i
           msg_channel 'Gotcha! Hope you have a great weekend.'
-
-          ::CheckIn.create!(
-            failed_to_happen: 'no meeting'
-          )
 
           :finish
         else
@@ -143,6 +139,10 @@ module Hackbot
       end
 
       private
+
+      def first_check_in?
+        CheckIn.where("data->>'channel' = ?", data['channel']).empty?
+      end
 
       def integer?(str)
         Integer(str) && true
