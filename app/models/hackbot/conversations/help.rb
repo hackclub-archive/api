@@ -14,7 +14,7 @@ module Hackbot
         event[:text] =~ /help/ && event[:user] != team.bot_user_id
       end
 
-      def start(event)
+      def start(_event)
         msg_channel HELP_MENU
 
         :finish

@@ -17,13 +17,13 @@ module Hackbot
 
         if first_check_in?
           msg_channel "Hey #{first_name}! I'm Hackbot, Hack Club's friendly "\
-                      "robot helper."
+                      'robot helper.'
           msg_channel "I'll be reaching out to you every week, typically on "\
                       "Fridays, to check in and see how your club's doing. "\
                       "I'll be sharing everything with the team, so they'll "\
-                      "be in the loop every step of the way "\
-                      ":slightly_smiling_face:"
-          msg_channel "To start, did you have a club meeting this week?"
+                      'be in the loop every step of the way '\
+                      ':slightly_smiling_face:'
+          msg_channel 'To start, did you have a club meeting this week?'
         else
           msg_channel "Hey #{first_name}! Did you have a club meeting this week?"
         end
