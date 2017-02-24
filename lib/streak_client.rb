@@ -17,6 +17,16 @@ module StreakClient
       @api_base + url
     end
 
+    # Streak, usually, expects to be fed JSON on it's REST API. However, there
+    # is an inconsistency on the POST /v1/{box}/tasks endpoint.  Instead of
+    # this endpoint expecting JSON, it expects that it's parameters are encoded
+    # as part of the URL. The default value for `encoding` is :auto, which will
+    # choose what the encoding should be depending on the `method` parameter
+    # (POST = :json_encoding.  PUT, GET = :url_encoding). Specifying
+    # `encoding=:url_encoding` will force the parameters to be encoded in the
+    # URL, and `encoding:json` will force the URLs to be encoded in the body as
+    # JSON.
+    #
     # rubocop:disable Metrics/MethodLength
     def request(method, path, params = {}, headers = {}, encoding = :auto)
       payload = nil
