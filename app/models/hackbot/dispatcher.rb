@@ -3,6 +3,7 @@ module Hackbot
     CONVERSATION_TYPES = [
       Hackbot::Conversations::CheckIn,
       Hackbot::Conversations::Help,
+      Hackbot::Conversations::Define,
       Hackbot::Conversations::Gifs
     ].freeze
 
