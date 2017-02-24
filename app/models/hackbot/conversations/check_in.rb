@@ -135,7 +135,7 @@ module Hackbot
       # rubocop:enable Metrics/CyclomaticComplexity, Metrics/MethodLength
 
       def wait_for_notes(event)
-        record_notes event if should_record_notes? event
+        handle_notes event
 
         ::CheckIn.create!(
           club: club(event),
@@ -150,6 +150,20 @@ module Hackbot
       end
 
       private
+
+      def handle_notes(event)
+        next unless should_record_notes? event
+
+        lead = leader(event)
+
+        record_notes event
+
+        StreakClient.create_in_box(
+          lead.streak_key,
+          event[:text],
+          Time.zone.now.next_week(:monday)
+        )
+      end
 
       def should_record_notes?(event)
         (event[:text] =~ /^(no|nope|nah)$/i).nil?
