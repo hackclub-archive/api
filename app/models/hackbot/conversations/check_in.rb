@@ -147,9 +147,46 @@ module Hackbot
 
         msg_channel "Sweet, I'll let them know! Hope you have a hack-tastic "\
                     'weekend!'
+
+        display_stats event
+
+        :finish
       end
 
       private
+
+      def display_stats(event)
+        stats = calculate_stats event
+
+        msg_channel "You have a response rate of #{stats[:response_rate]}%"
+        msg_channel "You've had #{stats[:conversations_had]} conversations with me"
+        msg_channel "On average, you have #{stats[:average_attendance]} people attend your club"
+        msg_channel "The lowest amount of people you've had attend your club is #{stats[:min_attendance]}"
+        msg_channel "But the most is #{stats[:max_attendance]}!"
+      end
+
+      def calculate_stats(event)
+        lead = leader(event)
+
+        check_ins = Hackbot::Conversations::CheckIn.where("data->>'channel' = ?", data['channel'])
+        got_response = check_ins.where.not("data->>'failed_to_complete' IS NULL")
+        response_rate = got_response.length / check_ins.length * 100
+
+        meetings = ::CheckIn.where(leader: lead)
+        average_attendance = meetings.average :attendance
+        min_attendance = meetings.minimum :attendance
+        max_attendance = meetings.maximum :attendance
+
+        {
+          response_rate: response_rate,
+          conversations_had: 100,
+          meetings_had: meetings.length,
+          average_attendance: average_attendance,
+          min_attendance: min_attendance,
+          max_attendance: max_attendance
+        }
+
+      end
 
       def should_record_notes?(event)
         (event[:text] =~ /^(no|nope|nah)$/i).nil?
