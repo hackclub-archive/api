@@ -11,7 +11,7 @@ module UrbanDictionaryClient
 
       resp = RestClient.get(BASE_URL, headers)
       data = JSON.parse(resp, symbolize_names: true)
-      data[:result_type] == "no_results" ? nil : data[:list].first[:definition]
+      data[:result_type] == 'no_results' ? nil : data[:list].first[:definition]
     end
   end
 end
