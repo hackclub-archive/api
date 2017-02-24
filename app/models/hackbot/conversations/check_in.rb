@@ -188,7 +188,7 @@ module Hackbot
 
         {
           response_rate: response_rate,
-          conversations_had: 100,
+          conversations_had: check_ins.length,
           meetings_had: meetings.length,
           average_attendance: average_attendance,
           min_attendance: min_attendance,
