@@ -134,6 +134,7 @@ module Hackbot
       end
       # rubocop:enable Metrics/CyclomaticComplexity, Metrics/MethodLength
 
+      # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
       def wait_for_notes(event)
         record_notes event if should_record_notes? event
 
@@ -145,11 +146,72 @@ module Hackbot
           notes: data['notes']
         )
 
-        msg_channel "Sweet, I'll let them know! Hope you have a hack-tastic "\
-                    'weekend!'
+        if should_display_stats? event
+          msg_channel "Sweet, I'll let them know. Thanks for responding to "\
+                      "me! Before I go, here's some stats from our "\
+                      'conversations.'
+          display_stats event
+        else
+          msg_channel "Sweet, I'll let them know! Hope you have a hack-tastic "\
+                      'weekend!'
+        end
+
+        :finish
       end
+      # rubocop:enable Metrics/MethodLength, Metrics/AbcSize
 
       private
+
+      MINIMUM_MEETINGS = 2
+
+      def should_display_stats?(event)
+        ::CheckIn.where(leader: leader(event)).length > MINIMUM_MEETINGS
+      end
+
+      # rubocop:disable Metrics/MethodLength
+      def display_stats(event)
+        stats = calculate_stats event
+
+        msg_channel "```\n"\
+                    "You have a response rate of #{stats[:response_rate]}%\n"\
+                    "You've had #{stats[:conversations_had]} conversations "\
+                    "with me\n"\
+                    "On average, you have #{stats[:average_attendance]} "\
+                    "people attend your club\n"\
+                    "The lowest amount of people you've had attend your club "\
+                    "is #{stats[:min_attendance]}\n"\
+                    "But the most is #{stats[:max_attendance]}!\n"\
+                    '```'
+      end
+      # rubocop:enable Metrics/MethodLength
+
+      # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
+      def calculate_stats(event)
+        lead = leader(event)
+
+        check_ins = Hackbot::Conversations::CheckIn.where(
+          "data->>'channel' = ?",
+          data['channel']
+        )
+
+        got_response = check_ins.where("data->>'failed_to_complete' IS NULL")
+        response_rate = got_response.length / check_ins.length * 100
+
+        meetings = ::CheckIn.where(leader: lead)
+        average_attendance = meetings.average :attendance
+        min_attendance = meetings.minimum :attendance
+        max_attendance = meetings.maximum :attendance
+
+        {
+          response_rate: response_rate,
+          conversations_had: check_ins.length,
+          meetings_had: meetings.length,
+          average_attendance: average_attendance.to_i,
+          min_attendance: min_attendance,
+          max_attendance: max_attendance
+        }
+      end
+      # rubocop:enable Metrics/MethodLength, Metrics/AbcSize
 
       def should_record_notes?(event)
         (event[:text] =~ /^(no|nope|nah)$/i).nil?
