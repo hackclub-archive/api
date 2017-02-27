@@ -1,6 +1,8 @@
 module Hackbot
   module Conversations
-    class Help < Hackbot::Conversations::Channel
+    class Help < Hackbot::Conversations::SingleMessageCommand
+      set_command 'help'
+
       HELP_MENU = "Hi! I'm Hack Club's friendly robot helper. I don't do "\
                   "much right now, but if you're a club leader you've "\
                   'probably received some messages from me about the '\
@@ -10,11 +12,7 @@ module Hackbot
                   "out https://github.com/hackclub/api/issues. I'd love to "\
                   'learn some new tricks from you!'.freeze
 
-      def self.should_start?(event, team)
-        event[:text].include?('help') && mentions_name?(event, team)
-      end
-
-      def start(_event)
+      def respond(_query)
         msg_channel HELP_MENU
 
         :finish

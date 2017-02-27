@@ -1,12 +1,9 @@
 module Hackbot
   module Conversations
-    class Gifs < Hackbot::Conversations::Channel
-      def self.should_start?(event, team)
-        event[:text].include?('gif') && mentions_name?(event, team)
-      end
+    class Gifs < Hackbot::Conversations::SingleMessageCommand
+      set_command 'gif'
 
-      def start(event)
-        query = event_to_query event
+      def respond(query)
         if query.empty?
           msg_channel 'You need to provide a query, silly!'
 
@@ -19,13 +16,6 @@ module Hackbot
       end
 
       private
-
-      def event_to_query(event)
-        event[:text]
-          .sub(team[:bot_username], '')
-          .sub("<@#{team[:bot_user_id]}>", '')
-          .sub('gif', '').strip
-      end
 
       def send_gif(text, url)
         SlackClient.rpc('chat.postMessage',
