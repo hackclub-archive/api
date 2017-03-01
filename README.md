@@ -72,6 +72,12 @@ SLACK_CLIENT_SECRET
 
 # Secret code required when redeeming .tech domains
 TECH_DOMAIN_REDEMPTION_SECRET_CODE
+
+# Giphy API usage
+GIPHY_API_KEY
+
+# Default Slack team ID (Probably for Hack Club)
+DEFAULT_SLACK_TEAM_ID
 ```
 
 ## Other Setup

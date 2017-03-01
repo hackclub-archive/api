@@ -51,11 +51,12 @@ class Leader < ApplicationRecord
   has_many :check_ins
 
   validates :name, presence: true
+  validates :team_id, presence: true
 
   def slack_update
     if slack_id_changed?
       info = SlackClient::Users.info(slack_id, access_token)[:user]
-      slack_username = info[:name]
+      self.slack_username = info[:name]
     elsif slack_username_changed?
       user = user_from_username slack_username
       self.slack_id = user[:id]
@@ -68,8 +69,7 @@ class Leader < ApplicationRecord
     @all_users.find { |u| u[:name] == username }
   end
 
-  # TODO: make this handle multiple Slack teams
   def access_token
-    Hackbot::Team.first.bot_access_token
+    Hackbot::Team.find_by(team_id: slack_team_id).bot_access_token
   end
 end

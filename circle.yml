@@ -14,6 +14,7 @@ machine:
     SLACK_CLIENT_SECRET: fake_client_secret
     TECH_DOMAIN_REDEMPTION_SECRET_CODE: fake_secret_code
     GIPHY_API_KEY: fake_giphy_api_key
+    DEFAULT_SLACK_TEAM_ID: fake_slack_team_id
 
 test:
   override:
