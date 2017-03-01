@@ -51,9 +51,10 @@ class Leader < ApplicationRecord
   has_many :check_ins
 
   validates :name, presence: true
-  validates :team_id, presence: true
 
   def slack_update
+    return if access_token.nil?
+
     if slack_id_changed?
       info = SlackClient::Users.info(slack_id, access_token)[:user]
       self.slack_username = info[:name]
@@ -70,6 +71,12 @@ class Leader < ApplicationRecord
   end
 
   def access_token
-    Hackbot::Team.find_by(team_id: slack_team_id).bot_access_token
+    return nil if team.nil?
+
+    team.bot_access_token
+  end
+
+  def team
+    Hackbot::Team.find_by(team_id: slack_team_id)
   end
 end

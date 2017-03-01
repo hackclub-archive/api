@@ -23,7 +23,6 @@ ActiveRecord::Schema.define(version: 20170228131808) do
     t.text     "notes"
     t.datetime "created_at",   null: false
     t.datetime "updated_at",   null: false
-    t.text     "did_happen"
     t.index ["club_id"], name: "index_check_ins_on_club_id", using: :btree
     t.index ["leader_id"], name: "index_check_ins_on_leader_id", using: :btree
   end
@@ -118,15 +117,6 @@ ActiveRecord::Schema.define(version: 20170228131808) do
     t.index ["streak_key"], name: "index_letters_on_streak_key", using: :btree
   end
 
-  create_table "main_point_of_contacts", force: :cascade do |t|
-    t.integer  "club_id"
-    t.integer  "leader_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["club_id"], name: "index_main_point_of_contacts_on_club_id", using: :btree
-    t.index ["leader_id"], name: "index_main_point_of_contacts_on_leader_id", using: :btree
-  end
-
   create_table "tech_domain_redemptions", force: :cascade do |t|
     t.text     "name"
     t.text     "email"
@@ -137,6 +127,4 @@ ActiveRecord::Schema.define(version: 20170228131808) do
 
   add_foreign_key "check_ins", "clubs"
   add_foreign_key "check_ins", "leaders"
-  add_foreign_key "main_point_of_contacts", "clubs"
-  add_foreign_key "main_point_of_contacts", "leaders"
 end

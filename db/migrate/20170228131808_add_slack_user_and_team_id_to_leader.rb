@@ -17,16 +17,11 @@ class AddSlackUserAndTeamIdToLeader < ActiveRecord::Migration[5.0]
   private
 
   def populate_slack_ids!
-    team = select_one 'SELECT * FROM hackbot_teams '\
-                      "WHERE team_id = '#{HACK_CLUB_TEAM_ID}'"
-
-    access_token = team['bot_access_token']
+    return if select_all('SELECT * FROM leaders').empty?
 
     leaders = select_all 'SELECT * FROM leaders '\
                          'WHERE slack_username IS NOT NULL AND '\
                          "slack_username != ''"
-
-    return if leaders.empty?
 
     all_users ||= slack_list_users access_token
 
@@ -36,6 +31,13 @@ class AddSlackUserAndTeamIdToLeader < ActiveRecord::Migration[5.0]
       update "UPDATE leaders SET slack_id = '#{slack_user[:id]}' "\
              "WHERE slack_username = '#{leader['slack_username']}'"
     end
+  end
+
+  def access_token
+    team = select_one 'SELECT * FROM hackbot_teams '\
+                      "WHERE team_id = '#{HACK_CLUB_TEAM_ID}'"
+
+    team['bot_access_token']
   end
 
   def populate_slack_team_ids!
