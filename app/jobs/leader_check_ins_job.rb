@@ -7,9 +7,9 @@ class LeaderCheckInsJob < ApplicationJob
   LEADER_PIPELINE_KEY = Rails.application.secrets.streak_leader_pipeline_key
 
   def perform(usernames = [])
-    user_ids = active_leadre_slack_ids
+    user_ids = active_leader_slack_ids
 
-    user_ids = user_ids_from_usernames usernames unless usernames.empty
+    user_ids = user_ids_from_usernames usernames unless usernames.empty?
 
     user_ids.each do |user_id|
       im = open_im(user_id)

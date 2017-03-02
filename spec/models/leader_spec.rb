@@ -13,6 +13,7 @@ RSpec.describe Leader, type: :model do
   it { should have_db_column :email }
   it { should have_db_column :slack_username }
   it { should have_db_column :slack_id }
+  it { should have_db_column :slack_team_id }
   it { should have_db_column :github_username }
   it { should have_db_column :twitter_username }
   it { should have_db_column :phone_number }
