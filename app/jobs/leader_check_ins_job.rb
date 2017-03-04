@@ -6,12 +6,13 @@ class LeaderCheckInsJob < ApplicationJob
   ACTIVE_STAGE_KEY = '5006'.freeze
   LEADER_PIPELINE_KEY = Rails.application.secrets.streak_leader_pipeline_key
 
-  def perform(*)
-    active_leader_usernames.each do |username|
-      user = user_from_username(username)
-      next if user.nil? # couldn't find the user
+  def perform(usernames = [])
+    user_ids = active_leader_slack_ids
 
-      im = open_im(user)
+    user_ids = user_ids_from_usernames usernames unless usernames.empty?
+
+    user_ids.each do |user_id|
+      im = open_im(user_id)
       event = construct_fake_event(user, im[:channel][:id])
 
       convo = Hackbot::Conversations::CheckIn.new(team: slack_team)
@@ -36,8 +37,17 @@ class LeaderCheckInsJob < ApplicationJob
     }
   end
 
-  def open_im(user)
-    SlackClient::Chat.open_im(user[:id], access_token)
+  def open_im(user_id)
+    SlackClient::Chat.open_im(user_id, access_token)
+  end
+
+  def user_ids_from_usernames(usernames)
+    usernames.map do |u|
+      user = user_from_username u
+      next unless user.nil?
+
+      user[:id]
+    end
   end
 
   def user_from_username(username)
@@ -46,9 +56,9 @@ class LeaderCheckInsJob < ApplicationJob
     @all_users.find { |u| u[:name] == username }
   end
 
-  def active_leader_usernames
+  def active_leader_slack_ids
     active_leaders
-      .map(&:slack_username)
+      .map(&:slack_id)
       .reject { |u| u.nil? || u.empty? }
   end
 

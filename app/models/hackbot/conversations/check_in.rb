@@ -138,7 +138,7 @@ module Hackbot
       end
       # rubocop:enable Metrics/CyclomaticComplexity, Metrics/MethodLength
 
-      # rubocop:disable Metrics/MethodLength
+      # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
       def wait_for_notes(event)
         if should_record_notes? event
           notes = record_notes event
@@ -154,10 +154,14 @@ module Hackbot
           notes: data['notes']
         )
 
-        msg_channel "Sweet, I'll let them know! Hope you have a hack-tastic "\
-                    'weekend!'
+        if data['notes'].nil?
+          msg_channel 'OK. Hope you have a hack-tastic weekend!'
+        else
+          msg_channel "Sweet, I'll let them know! Hope you have a hack-tastic "\
+                      'weekend!'
+        end
       end
-      # rubocop:enable Metrics/MethodLength
+      # rubocop:enable Metrics/MethodLength, Metrics/AbcSize
 
       private
 
@@ -194,18 +198,9 @@ module Hackbot
       end
 
       def leader(event)
-        @u ||= user(event)
-        @leader ||= Leader.find_by(slack_username: @u[:name])
+        @leader ||= Leader.find_by(slack_id: event[:user])
 
         @leader
-      end
-
-      def user(event)
-        user_id = event[:user]
-
-        resp = SlackClient::Users.info(user_id, access_token)
-
-        resp[:user]
       end
     end
     # rubocop:enable Metrics/ClassLength
