@@ -43,7 +43,11 @@ module Hackbot
       # rubocop:enable Metrics/MethodLength
 
       def wait_for_no_meeting_reason(event)
-        record_notes event if should_record_notes? event
+        if should_record_notes? event
+          notes = record_notes event
+          create_task leader(event), 'Follow-up on notes from a failed '\
+                                     "meeting: #{notes}"
+        end
 
         msg_channel copy('no_meeting_reason')
       end
@@ -116,7 +120,11 @@ module Hackbot
       # rubocop:disable Metrics/MethodLength
       # rubocop:disable Metrics/AbcSize
       def wait_for_notes(event)
-        record_notes event if should_record_notes? event
+        if should_record_notes? event
+          notes = record_notes event
+          create_task leader(event), 'Follow-up on notes from check-in: '\
+                                     "#{notes}"
+        end
 
         ::CheckIn.create!(
           club: club(event),
@@ -136,6 +144,14 @@ module Hackbot
       # rubocop:enable Metrics/AbcSize
 
       private
+
+      def create_task(lead, text)
+        StreakClient::Task.create_in_box(
+          lead.streak_key,
+          text,
+          Time.zone.now.next_week(:monday)
+        )
+      end
 
       def should_record_notes?(event)
         (event[:text] =~ /^(no|nope|nah)$/i).nil?

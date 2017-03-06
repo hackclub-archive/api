@@ -17,8 +17,18 @@ module StreakClient
       @api_base + url
     end
 
+    # Streak, usually, expects to be fed JSON on it's REST API. However, there
+    # is an inconsistency on the POST /v1/{box}/tasks endpoint.  Instead of
+    # this endpoint expecting JSON, it expects that it's parameters are encoded
+    # as part of the URL. The default value for `encoding` is :auto, which will
+    # choose what the encoding should be depending on the `method` parameter
+    # (POST = :json_encoding.  PUT, GET = :url_encoding). Specifying
+    # `encoding=:url_encoding` will force the parameters to be encoded in the
+    # URL, and `encoding:json` will force the URLs to be encoded in the body as
+    # JSON.
+    #
     # rubocop:disable Metrics/MethodLength
-    def request(method, path, params = {}, headers = {})
+    def request(method, path, params = {}, headers = {}, encoding = :auto)
       payload = nil
 
       raise AuthenticationError, 'No API key provided' unless @api_key
@@ -27,14 +37,14 @@ module StreakClient
 
       params = transform_params(params)
 
-      case method
-      when :post
+      encoding = auto_detect_encoding encoding if encoding == :auto
+
+      case encoding
+      when :url_encoding
+        headers[:params] = params
+      when :json_encoding
         headers['Content-Type'] = 'application/json'
         payload = params.to_json
-      when :put
-        headers[:params] = params
-      when :get
-        headers[:params] = params
       end
 
       resp = RestClient::Request.execute(method: method, url: api_url(path),
@@ -45,6 +55,15 @@ module StreakClient
     # rubocop:enable Metrics/MethodLength
 
     private
+
+    def auto_detect_encoding(method)
+      case method
+      when :post
+        :json_encoding
+      when :put, :get
+        :url_encoding
+      end
+    end
 
     def construct_http_auth_header(username, password)
       "Basic #{Base64.strict_encode64(username + ':' + password)}"
