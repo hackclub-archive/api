@@ -128,13 +128,7 @@ module Hackbot
       def wait_for_notes(event)
         record_notes event if should_record_notes? event
 
-        ::CheckIn.create!(
-          club: club(event),
-          leader: leader(event),
-          meeting_date: data['meeting_date'],
-          attendance: data['attendance'],
-          notes: data['notes']
-        )
+        generate_check_in event
 
         if data['notes'].nil?
           msg_channel copy('notes.no_notes')
@@ -146,6 +140,16 @@ module Hackbot
       end
       # rubocop:enable Metrics/MethodLength
       # rubocop:enable Metrics/AbcSize
+
+      def generate_check_in(event)
+        ::CheckIn.create!(
+          club: club(event),
+          leader: leader(event),
+          meeting_date: data['meeting_date'],
+          attendance: data['attendance'],
+          notes: data['notes']
+        )
+      end
 
       private
 
