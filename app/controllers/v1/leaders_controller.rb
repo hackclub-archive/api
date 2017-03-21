@@ -11,6 +11,8 @@ module V1
 
       if leader.save
         welcome_letter_for_leader(leader).save!
+        welcome_message leader
+
         render json: leader, status: 201
       else
         render json: { errors: leader.errors }, status: 422
@@ -44,6 +46,45 @@ module V1
         what_to_send: '9005',
         address: leader.address
       )
+    end
+
+    def welcome_message(leader)
+      token = access_token leader
+      return if token.nil?
+
+      im = SlackClient::Chat.open_im(leader.slack_id, token)
+      return unless im[:ok] || !im[:latest].nil?
+
+      send_msg(
+        im[:channel][:id],
+        copy('welcome', first_name: leader.name),
+        token
+      )
+    end
+
+    def send_msg(channel, text, token)
+      SlackClient::Chat.send_msg(
+        channel,
+        text,
+        token,
+        as_user: true
+      )
+    end
+
+    def copy(selector, values)
+      cs = CopyService.new('leaders_controller', values)
+
+      cs.get_copy(selector)
+    end
+
+    def access_token(leader)
+      t = team leader.slack_team_id
+
+      t.nil? ? nil : t.bot_access_token
+    end
+
+    def team(team_id)
+      Hackbot::Team.find_by(team_id: team_id)
     end
   end
 end
