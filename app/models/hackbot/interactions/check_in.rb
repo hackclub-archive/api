@@ -2,6 +2,11 @@
 
 # A few Rubocop cops are disabled in this file because it's pending a refactor.
 # See https://github.com/hackclub/api/issues/25.
+
+# I'm experimenting with a new naming convention here. Any method that expects
+# only button callback events should be suffixed with `_press`.
+
+# TODO Suffix every button method with `_press`
 module Hackbot
   module Interactions
     # rubocop:disable Metrics/ClassLength
@@ -17,33 +22,73 @@ module Hackbot
       def start
         first_name = leader.name.split(' ').first
         deadline = formatted_deadline leader
-        key = (first_check_in? ? 'first_greeting' : 'greeting')
+        key = 'greeting'
+        buttons = [
+          { text: 'Yes, my club met!', value: 'yes' },
+          { text: 'No, my club did not meet', value: 'no' }
+        ]
 
-        msg_channel copy(key, first_name: first_name, deadline: deadline)
+        # If this is their first check in, we'll give them a special greeting
+        # message
+        key = 'first_greeting' if first_check_in?
+
+        # If they've had previous successful check ins we'll change the buttons
+        # to include an option for meeting on the same day as the previous check
+        # in
+        if previous_check_in_day
+          buttons = [
+            { text: "Yes, on #{previous_check_in_day}",
+              value: 'previous_day' },
+            { text: 'Yes, on another day',
+              value: 'yes' },
+            { text: 'No', value: 'no' }
+          ]
+        end
+
+        msg_channel(
+          text: copy(key, first_name: first_name, deadline: deadline),
+          attachments: [
+            fallback: 'Choose yes or no',
+            actions: buttons
+          ]
+        )
 
         default_follow_up 'wait_for_meeting_confirmation'
-
         :wait_for_meeting_confirmation
       end
 
       # rubocop:disable Metrics/MethodLength
       def wait_for_meeting_confirmation
-        case msg
-        when Hackbot::Utterances.yes
+        return unless action
+
+        resp = case action[:value]
+               when 'yes'
+                 ":white_check_mark: *You had a meeting*"
+               when 'previous_day'
+                 ":white_check_mark: *You had a meeting on #{previous_check_in_day}*"
+               when 'no'
+                 ":no_entry_sign: *You did not have a meeting*"
+               end
+        update_action_source(**event[:msg], attachments: [text: resp])
+
+        case action[:value]
+        when 'yes'
           msg_channel copy('meeting_confirmation.positive')
 
           default_follow_up 'wait_for_day_of_week'
           :wait_for_day_of_week
-        when Hackbot::Utterances.no
+        when 'previous_day'
+          data['meeting_date'] = Chronic.parse(previous_check_in_day, context: :past)
+
+          msg_channel copy('day_of_week.valid')
+
+          default_follow_up 'wait_for_attendance'
+          :wait_for_attendance
+        when 'no'
           msg_channel copy('meeting_confirmation.negative')
 
           default_follow_up 'wait_for_no_meeting_reason'
           :wait_for_no_meeting_reason
-        else
-          msg_channel copy('meeting_confirmation.invalid')
-
-          default_follow_up 'wait_for_meeting_confirmation'
-          :wait_for_meeting_confirmation
         end
       end
       # rubocop:enable Metrics/MethodLength
@@ -52,7 +97,18 @@ module Hackbot
         data['no_meeting_reason'] = msg
 
         if should_ask_if_dead?
-          msg_channel copy('no_meeting_reason')
+          msg_channel(
+            text: copy('no_meeting_reason'),
+            attachments: [
+              fallback: 'Choose yes or no',
+              actions: [
+                # TODO: Write these button messages better
+                { text: 'Yep!',
+                  value: 'yes' },
+                { text: 'Nope', value: 'no' }
+              ]
+            ]
+          )
 
           default_follow_up 'wait_for_meeting_in_the_future'
           :wait_for_meeting_in_the_future
@@ -66,22 +122,27 @@ module Hackbot
 
       # rubocop:disable Metrics/MethodLength
       def wait_for_meeting_in_the_future
-        case msg
-        when Hackbot::Utterances.yes
+        return unless action
+
+        resp =  case action[:value]
+                when 'yes'
+                  ":white_check_mark: *You plan on meeting*"
+                when 'no'
+                  ":no_entry_sign: *Your club is no longer meeting*"
+                end
+        update_action_source(**event[:msg], attachments: [text: resp])
+
+        case action[:value]
+        when 'yes'
           msg_channel copy('meeting_in_the_future.positive')
 
           default_follow_up 'wait_for_help'
           :wait_for_help
-        when Hackbot::Utterances.no
+        when 'no'
           msg_channel copy('meeting_in_the_future.negative')
           data['wants_to_be_dead'] = true
 
           :finish
-        else
-          msg_channel copy('meeting_in_the_future.invalid')
-
-          default_follow_up 'wait_for_meeting_in_the_future'
-          :wait_for_meeting_in_the_future
         end
       end
       # rubocop:enable Metrics/MethodLength
@@ -268,6 +329,11 @@ module Hackbot
 
       def first_check_in?
         CheckIn.where("data->>'channel' = ?", data['channel']).empty?
+      end
+
+      def previous_check_in_day
+        # TODO: Support other previous days check-in days
+        Date::DAYNAMES[Date.parse('Tuesday').wday]
       end
 
       def integer?(str)
