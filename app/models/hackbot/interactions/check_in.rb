@@ -113,10 +113,19 @@ module Hackbot
           default_follow_up 'wait_for_meeting_in_the_future'
           :wait_for_meeting_in_the_future
         else
-          msg_channel copy('meeting_in_the_future.positive')
+          msg_channel(
+            text: copy('meeting_in_the_future.positive'),
+            attachments: [
+              fallback: 'Choose yes or no',
+              actions: [
+                { text: 'Yes', value: 'yes' },
+                { text: 'No', value: 'no' }
+              ]
+            ]
+          )
 
-          default_follow_up 'wait_for_help'
-          :wait_for_help
+          default_follow_up 'wait_for_preventing_future_meetings'
+          :wait_for_preventing_future_meetings
         end
       end
 
@@ -134,10 +143,19 @@ module Hackbot
 
         case action[:value]
         when 'yes'
-          msg_channel copy('meeting_in_the_future.positive')
+          msg_channel(
+            text: copy('meeting_in_the_future.positive'),
+            attachments: [
+              fallback: 'Choose yes or no',
+              actions: [
+                { text: 'Yes', value: 'yes' },
+                { text: 'No', value: 'no' }
+              ]
+            ]
+          )
 
-          default_follow_up 'wait_for_help'
-          :wait_for_help
+          default_follow_up 'wait_for_preventing_future_meetings'
+          :wait_for_preventing_future_meetings
         when 'no'
           msg_channel copy('meeting_in_the_future.negative')
           data['wants_to_be_dead'] = true
@@ -146,6 +164,28 @@ module Hackbot
         end
       end
       # rubocop:enable Metrics/MethodLength
+
+      def wait_for_preventing_future_meetings
+        return unless action
+        resp =  case action[:value]
+                when 'yes'
+                  ":no_entry_sign: *Something is preventing your club from meeting*"
+                when 'no'
+                  ":white_check_mark: *Nothing is preventing your club from meeting*"
+                end
+        update_action_source(**event[:msg], attachments: [text: resp])
+
+        case action[:value]
+        when 'no'
+
+          msg_channel copy('help')
+        when 'yes'
+          msg_channel copy('meeting_prevent_reason')
+
+          default_follow_up 'wait_for_help'
+          :wait_for_help
+        end
+      end
 
       def wait_for_help
         if should_record_notes?
