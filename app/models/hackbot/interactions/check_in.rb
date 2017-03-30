@@ -6,7 +6,6 @@
 # I'm experimenting with a new naming convention here. Any method that expects
 # only button callback events should be suffixed with `_press`.
 
-# TODO Suffix every button method with `_press`
 module Hackbot
   module Interactions
     # rubocop:disable Metrics/ClassLength
@@ -53,12 +52,12 @@ module Hackbot
           ]
         )
 
-        default_follow_up 'wait_for_meeting_confirmation'
-        :wait_for_meeting_confirmation
+        default_follow_up 'wait_for_meeting_confirmation_press'
+        :wait_for_meeting_confirmation_press
       end
 
       # rubocop:disable Metrics/MethodLength
-      def wait_for_meeting_confirmation
+      def wait_for_meeting_confirmation_press
         return unless action
 
         resp = case action[:value]
@@ -110,8 +109,8 @@ module Hackbot
             ]
           )
 
-          default_follow_up 'wait_for_meeting_in_the_future'
-          :wait_for_meeting_in_the_future
+          default_follow_up 'wait_for_meeting_in_the_future_press'
+          :wait_for_meeting_in_the_future_press
         else
           msg_channel(
             text: copy('meeting_in_the_future.positive'),
@@ -124,13 +123,13 @@ module Hackbot
             ]
           )
 
-          default_follow_up 'wait_for_preventing_future_meetings'
-          :wait_for_preventing_future_meetings
+          default_follow_up 'wait_for_preventing_future_meetings_press'
+          :wait_for_preventing_future_meetings_press
         end
       end
 
       # rubocop:disable Metrics/MethodLength
-      def wait_for_meeting_in_the_future
+      def wait_for_meeting_in_the_future_press
         return unless action
 
         resp =  case action[:value]
@@ -154,8 +153,8 @@ module Hackbot
             ]
           )
 
-          default_follow_up 'wait_for_preventing_future_meetings'
-          :wait_for_preventing_future_meetings
+          default_follow_up 'wait_for_preventing_future_meetings_press'
+          :wait_for_preventing_future_meetings_press
         when 'no'
           msg_channel copy('meeting_in_the_future.negative')
           data['wants_to_be_dead'] = true
@@ -165,7 +164,7 @@ module Hackbot
       end
       # rubocop:enable Metrics/MethodLength
 
-      def wait_for_preventing_future_meetings
+      def wait_for_preventing_future_meetings_press
         return unless action
         resp =  case action[:value]
                 when 'yes'
