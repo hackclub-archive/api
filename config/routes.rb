@@ -14,6 +14,7 @@ Rails.application.routes.draw do
       namespace :webhooks do
         post 'interactive_messages'
         post 'events'
+        post 'slash_command'
       end
     end
   end

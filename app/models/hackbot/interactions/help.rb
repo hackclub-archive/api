@@ -9,8 +9,8 @@ module Hackbot
       def start
         sorted_cmds = cmds.sort { |a, b| a[:usage] <=> b[:usage] }
 
-        msg_channel copy('help', commands: sorted_cmds,
-                                 bot_mention: '@' + team.bot_username)
+        reply copy('help', commands: sorted_cmds,
+                           bot_mention: '@' + team.bot_username)
       end
 
       private

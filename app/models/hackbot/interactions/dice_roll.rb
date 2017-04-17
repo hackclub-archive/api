@@ -22,11 +22,11 @@ module Hackbot
           copy('roll_4', result: rand(1..side_count))
         ]
 
-        msgs.each { |m| msg_channel(m) && sleep(0.5) }
+        msgs.each { |m| reply(m) && sleep(0.5) }
       end
 
       def bad_side_count
-        msg_channel copy('errors.bad_side_count')
+        reply copy('errors.bad_side_count')
       end
 
       def integer?(str)

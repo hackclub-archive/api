@@ -13,7 +13,7 @@ module Hackbot
         streak_key = captured[:streak_key]
 
         leader = Leader.find_by(streak_key: streak_key)
-        return msg_channel copy('start.invalid') if leader.nil?
+        return reply copy('start.invalid') if leader.nil?
 
         associate_clubs(leader.clubs, leader)
       end
@@ -24,7 +24,7 @@ module Hackbot
         if valid_club_index_input? club_ids
           handle_club_index_input club_ids
         else
-          msg_channel copy('clubs_num.invalid', num_of_clubs: club_ids.length)
+          reply copy('clubs_num.invalid', num_of_clubs: club_ids.length)
 
           :wait_for_clubs_num
         end
@@ -51,7 +51,7 @@ module Hackbot
       def associate_clubs(clubs, leader)
         if clubs.empty?
           name = pretty_leader_name leader
-          msg_channel copy('start.no_clubs', leader_name: name)
+          reply copy('start.no_clubs', leader_name: name)
 
           :finish
         elsif clubs.length == 1
@@ -76,11 +76,11 @@ module Hackbot
 
         name = pretty_leader_name leader
         if club.save!
-          msg_channel copy('set.success', leader_name: name,
-                                          club_name: club.name)
+          reply copy('set.success', leader_name: name,
+                                    club_name: club.name)
         else
-          msg_channel copy('set.failure', leader_name: name,
-                                          club_name: club.name)
+          reply copy('set.failure', leader_name: name,
+                                    club_name: club.name)
         end
       end
 
@@ -102,16 +102,16 @@ module Hackbot
       # rubocop:disable Metrics/AbcSize
       # rubocop:disable Metrics/MethodLength
       def associate_one_in_many_clubs(clubs, leader)
-        msg_channel copy('start.many_clubs.intro',
+        reply copy('start.many_clubs.intro',
                          leader_name: pretty_leader_name(leader))
 
         clubs.each.with_index(1) do |c, i|
           key = leader.streak_key
-          msg_channel copy('start.many_clubs.each', i: i, club_name: c.name,
-                                                    streak_key: key)
+          reply copy('start.many_clubs.each', i: i, club_name: c.name,
+                                              streak_key: key)
         end
 
-        msg_channel copy('start.many_clubs.outro')
+        reply copy('start.many_clubs.outro')
 
         data['club_ids'] = clubs.map(&:id)
         data['leader_id'] = leader.id

@@ -12,7 +12,7 @@ module Hackbot
         if query.present?
           try_sending_gif(query)
         else
-          msg_channel copy('start.invalid')
+          reply copy('start.invalid')
         end
       end
 
@@ -22,9 +22,9 @@ module Hackbot
         gif = GiphyClient.translate query
 
         if gif.nil?
-          msg_channel copy('start.not_found')
+          reply copy('start.not_found')
         else
-          attach_channel(
+          attach_reply(
             image_url: gif[:url],
             footer: copy('start.valid.text'),
             fallback: copy('start.valid.fallback')

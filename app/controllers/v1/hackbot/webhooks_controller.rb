@@ -44,6 +44,14 @@ module V1
         end
       end
 
+      def slash_command
+        return if params[:ssl_check] == '1'
+
+        event = slash_command_payload_to_event(params)
+
+        handle_event(event, event[:team_id])
+      end
+
       private
 
       def handle_event(event, team_id)
@@ -81,6 +89,22 @@ module V1
                         a[:value] == action[:value]
           end
         end
+      end
+
+      # Note: this introduces a new subtype of message called "slash_command".
+      #
+      # This isn't part of Slack's API and only exists in the Hackbot realm for
+      # our convenience.
+      def slash_command_payload_to_event(payload)
+        {
+          type: 'message',
+          subtype: 'slash_command',
+          user: payload[:user_id],
+          text: payload[:text],
+          channel: payload[:channel_id],
+          team_id: payload[:team_id],
+          response_url: payload[:response_url]
+        }
       end
     end
   end
