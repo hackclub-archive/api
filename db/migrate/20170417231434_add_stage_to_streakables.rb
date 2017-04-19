@@ -19,7 +19,9 @@ class AddStageToStreakables < ActiveRecord::Migration[5.0]
     reversible do |change|
       change.up do
         set_stage_on_models CLUB_PIPELINE_KEY, CLUB_TABLE_NAME
+        sleep 5
         set_stage_on_models LEADER_PIPELINE_KEY, LEADER_TABLE_NAME
+        sleep 5
         set_stage_on_models LETTERS_PIPELINE_KEY, LETTERS_TABLE_NAME
       end
     end
