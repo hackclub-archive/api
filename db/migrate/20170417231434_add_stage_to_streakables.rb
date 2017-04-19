@@ -2,14 +2,13 @@ class AddStageToStreakables < ActiveRecord::Migration[5.0]
   STREAK_API_BASE = 'https://www.streak.com/api'.freeze
   STREAK_API_KEY = Rails.application.secrets.streak_api_key
 
-  CLUB_PIPELINE_KEY = 'agxzfm1haWxmb29nYWVyNAsSDE9yZ2FuaXphdGlvbiINemFjaGxhdHR'\
-    'hLmNvbQwLEghXb3JrZmxvdxiAgICA6P2XCgw'.freeze
+  CLUBS_PIPELINE_KEY = Rails.application.secrets.streak_club_pipeline_key
   CLUB_TABLE_NAME = 'clubs'.freeze
-  LEADER_PIPELINE_KEY = 'agxzfm1haWxmb29nYWVyNAsSDE9yZ2FuaXphdGlvbiINemFjaGxhd'\
-    'HRhLmNvbQwLEghXb3JrZmxvdxiAgICAqoeSCgw'.freeze
+
+  LEADER_PIPELINE_KEY = Rails.application.secrets.streak_leader_pipeline_key
   LEADER_TABLE_NAME = 'leaders'.freeze
-  LETTERS_PIPELINE_KEY = 'agxzfm1haWxmb29nYWVyNAsSDE9yZ2FuaXphdGlvbiINemFjaGxh'\
-    'dHRhLmNvbQwLEghXb3JrZmxvdxiAgICA4LCFCgw'.freeze
+
+  LETTERS_PIPELINE_KEY = Rails.application.secrets.streak_letters_pipeline_key
   LETTERS_TABLE_NAME = 'letters'.freeze
 
   def change
