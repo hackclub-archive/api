@@ -18,6 +18,10 @@ module Hackbot
       ::SlackClient::Chat.send_msg(channel, nil, access_token, opts)
     end
 
+    def del_msg(channel, ts)
+      ::SlackClient::Chat.delete(channel, ts, access_token)
+    end
+
     def attach(channel, *attachments)
       send_msg(channel, attachments: attachments)
     end
