@@ -331,17 +331,25 @@ module Hackbot
         start
       end
 
+      # rubocop:disable Metrics/MethodLength
       def submit_check_in
-        if data['notes']
-          src = data['meeting_date'] ? 'check_in' : 'a failed meeting'
-          create_task(leader, "Follow-up on notes from #{src}: #{data[:notes]}")
-        end
-
         msg_channel copy('submit_check_in')
 
-        generate_check_in
-        send_attendance_stats
+        src = ''
+        if data['meeting_date']
+          src = 'check_in'
+
+          generate_check_in
+          send_attendance_stats
+        else
+          src = 'a failed meeting'
+        end
+
+        return unless data['notes']
+
+        create_task(leader, "Follow-up on notes from #{src}: #{data[:notes]}")
       end
+      # rubocop:enable Metrics/MethodLength
 
       # rubocop:disable Metrics/MethodLength
       # rubocop:disable Metrics/CyclomaticComplexity
