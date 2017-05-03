@@ -2,6 +2,8 @@ class Club < ApplicationRecord
   include Streakable
   include Geocodeable
 
+  before_update :notify_of_stage_change, if: :stage_key_changed?
+
   streak_pipeline_key Rails.application.secrets.streak_club_pipeline_key
   streak_default_field_mappings key: :streak_key, name: :name, notes: :notes,
                                 stage: :stage_key
@@ -40,6 +42,26 @@ class Club < ApplicationRecord
   validates :address, presence: true
   validates :latitude, presence: true
   validates :longitude, presence: true
+
+  def notify_of_stage_change
+    poc = point_of_contact
+
+    msg = CopyService.new('models/club', {}).get_copy("stage.#{stage_name}")
+
+    return if msg.nil?
+
+    SlackClient::Chat.send_msg(
+      poc.dm_channel_id,
+      msg,
+      poc.access_token,
+      as_user: true
+    )
+  end
+
+  def stage_name
+    pipeline = StreakClient::Pipeline.find(self.class.pipeline_key)
+    pipeline[:stages][stage_key.to_sym][:name]
+  end
 
   # This getter returns the point_of_contact_name.
   def point_of_contact_name
