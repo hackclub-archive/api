@@ -4,6 +4,7 @@ module Hackbot
       Hackbot::Interactions::CheckIn,
       Hackbot::Interactions::DemoCheckIn,
       Hackbot::Interactions::DiceRoll,
+      Hackbot::Interactions::Dormant,
       Hackbot::Interactions::Gifs,
       Hackbot::Interactions::Help,
       Hackbot::Interactions::Lookup,
