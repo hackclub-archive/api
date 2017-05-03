@@ -78,6 +78,17 @@ class Leader < ApplicationRecord
     nil
   end
 
+  def dm_channel_id
+    im = SlackClient::Chat.open_im(slack_id, access_token)
+    im[:channel][:id] if im[:channel]
+  end
+
+  def access_token
+    return nil if team.nil?
+
+    team.bot_access_token
+  end
+
   private
 
   def slack_id_sync
@@ -94,12 +105,6 @@ class Leader < ApplicationRecord
     @all_users ||= SlackClient::Users.list(access_token)[:members]
 
     @all_users.find { |u| u[:name] == username }
-  end
-
-  def access_token
-    return nil if team.nil?
-
-    team.bot_access_token
   end
 
   def team
