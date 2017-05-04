@@ -46,6 +46,8 @@ class Club < ApplicationRecord
   def notify_of_stage_change
     poc = point_of_contact
 
+    return if poc.nil?
+
     msg = CopyService.new('models/club', {}).get_copy("stage.#{stage_name}")
 
     return if msg.nil?
