@@ -1,0 +1,12 @@
+invalid_stage: "There isn't a valid stage in your command! :warning: Check the usage with the `help` command."
+stage_changed: "I've put <%= name %> in the *<%= stage_name %>* stage! <%= reaction %>"
+already_in_stage: "This club is already in the *<%= stage_name %>* stage!"
+reaction:
+    dormant: ':zzz:'
+    active: ':partyparrot:'
+    else: ':+1:'
+no_clubs_found: "I couldn't find that club in my database. :telescope:"
+many_clubs:
+    each: <%= i %>. <%= club_name %> _<%= club_stage %>_.
+    prompt: Which club would you like set to <%= stage_name %>?
+    action_result: ":white_check_mark: You want to change the state of <%= club_name %>"

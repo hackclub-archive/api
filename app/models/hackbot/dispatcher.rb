@@ -1,14 +1,13 @@
 module Hackbot
   class Dispatcher
     INTERACTION_TYPES = [
-      Hackbot::Interactions::Active,
       Hackbot::Interactions::CheckIn,
       Hackbot::Interactions::DemoCheckIn,
       Hackbot::Interactions::DiceRoll,
-      Hackbot::Interactions::Dormant,
       Hackbot::Interactions::Gifs,
       Hackbot::Interactions::Help,
       Hackbot::Interactions::Lookup,
+      Hackbot::Interactions::SetClub,
       Hackbot::Interactions::SetPoc,
       Hackbot::Interactions::Sql,
       Hackbot::Interactions::Stats,
