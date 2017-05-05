@@ -61,8 +61,7 @@ class Club < ApplicationRecord
   end
 
   def stage_name
-    pipeline = StreakClient::Pipeline.find(self.class.pipeline_key)
-    pipeline[:stages][stage_key.to_sym][:name]
+    self.class.stages[stage_key.to_sym][:name].downcase
   end
 
   # This getter returns the point_of_contact_name.
