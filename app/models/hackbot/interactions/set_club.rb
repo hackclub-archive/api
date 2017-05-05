@@ -13,11 +13,17 @@ module Hackbot
         'dormant' => '5014'
       }
 
+      def should_handle?
+        super &&
+          event[:user] == data['slack_id'] if state == 'wait_for_club_select'
+      end
+
       def start
         arr = captured[:args].split ' '
         data['stage_name'] = arr.first.downcase
         data['stage_key'] = STAGES[data['stage_name']]
         data['streak_key'] = arr.second
+        data['slack_id'] = event[:user]
 
         invalid_stage && return unless data['stage_key']
 
