@@ -3,9 +3,9 @@ module Hackbot
     class SetClub < Command
       include Concerns::LeaderAssociable
 
-      TRIGGER = /set-club *(?<args>.*)/
+      TRIGGER = /set-club ?(?<stage_name>.+)/
 
-      USAGE = 'set-club <dormant|active> <club_streak_key (admin only)>'.freeze
+      USAGE = 'set-club <dormant|active>'.freeze
       DESCRIPTION = 'pause check-ins for your club during summer break'.freeze
 
       STAGES = {
@@ -21,30 +21,15 @@ module Hackbot
         end
       end
 
+      # rubocop:disable Metrics/MethodLength
       # rubocop:disable Metrics/AbcSize
       def start
-        arr = captured[:args].split(' ')
-
-        data['stage_name'] = arr.first.downcase
+        data['stage_name'] = captured[:stage_name]
         data['stage_key'] = STAGES[data['stage_name']]
-        data['streak_key'] = arr.second
         data['slack_id'] = event[:user]
 
         invalid_stage && return unless data['stage_key']
 
-        data['streak_key'] ? admin_run : leader_run
-      end
-      # rubocop:enable Metrics/AbcSize
-
-      private
-
-      def admin_run
-        data['club'] = Club.find_by(streak_key: data['streak_key'])
-        not_found if data['club'].nil?
-        set_single_club
-      end
-
-      def leader_run
         case leader.clubs.count
         when 0
           msg_channel copy('no_clubs_found')
@@ -55,16 +40,21 @@ module Hackbot
           set_one_in_many_clubs
         end
       end
+      # rubocop:enable Metrics/MethodLength
+      # rubocop:enable Metrics/AbcSize
+
+      private
 
       def set_one_in_many_clubs
-        actions = []
-        leader.clubs.each { |c| actions << { text: c.name, value: c.id } }
+        actions = leader.clubs.map { |c| { text: c.name, value: c.id } }
+
         msg_channel(
           text: copy('many_clubs.prompt', stage_name: data['stage_name']),
           attachments: [
             actions: actions
           ]
         )
+
         :wait_for_club_select
       end
 
