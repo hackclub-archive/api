@@ -85,6 +85,7 @@ module Hackbot
 
           stage_changed if data['club'].save
         end
+        :finish
       end
 
       def stage_changed
