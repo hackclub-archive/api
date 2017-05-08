@@ -10,3 +10,7 @@ many_clubs:
     each: <%= i %>. <%= club_name %> _<%= club_stage %>_.
     prompt: Which club would you like set to <%= stage_name %>?
     action_result: ":white_check_mark: You want to change the state of <%= club_name %>"
+activation_date:
+    prompt: What day will your club be starting up again? (I need the date in the format YYYY-MM-DD).
+    confirmation: Sounds good! The team will follow up with you sometime before <%= activation_date %>.
+
