@@ -1,5 +1,5 @@
 invalid_stage: "There isn't a valid stage in your command! :warning: Check the usage with the `help` command."
-stage_changed: "I've put <%= name %> in the *<%= stage_name %>* stage! <%= reaction %>"
+stage_changed: "I'll put <%= name %> in the *<%= stage_name %>* stage! <%= reaction %>"
 already_in_stage: "This club is already in the *<%= stage_name %>* stage!"
 reaction:
     dormant: ':zzz:'

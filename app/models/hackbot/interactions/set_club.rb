@@ -8,10 +8,7 @@ module Hackbot
       USAGE = 'set-club <dormant|active>'.freeze
       DESCRIPTION = 'pause check-ins for your club during summer break'.freeze
 
-      STAGES = {
-        'active' => '5003',
-        'dormant' => '5014'
-      }.freeze
+      STAGES = %w(active dormant).freeze
 
       def should_handle?
         super && event[:user] == data['slack_id'] unless state == 'start'
@@ -21,10 +18,9 @@ module Hackbot
       # rubocop:disable Metrics/AbcSize
       def start
         data['stage_name'] = captured[:stage_name]
-        data['stage_key'] = STAGES[data['stage_name']]
         data['slack_id'] = event[:user]
 
-        invalid_stage && return unless data['stage_key']
+        invalid_stage && return unless STAGES.include? data['stage_name']
 
         case leader.clubs.count
         when 0
@@ -52,7 +48,7 @@ module Hackbot
 
       # rubocop:disable Metrics/AbcSize
       def wait_for_activation_date
-        return :wait_for_club_select unless msg
+        return :wait_for_activation_date unless msg
 
         data['activation_date'] = Chronic.parse(msg, bias: :future)
         human_date = data['activation_date']
@@ -61,7 +57,7 @@ module Hackbot
         msg_channel copy('activation_date.confirmation',
                          activation_date: human_date)
 
-        data['club'].update(activation_date: data['activation_date'])
+        Club.find(data['club']['id']).make_dormant(data['activation_date'])
 
         :finish
       end
@@ -82,20 +78,19 @@ module Hackbot
         :wait_for_club_select
       end
 
-      # rubocop:disable Metrics/AbcSize
       def set_single_club
-        if data['club'].stage_key == data['stage_key']
+        case data['stage_name']
+        when data['club'].stage_name
           already_in_stage
-        else
-          data['club'].stage_key = data['stage_key']
-          data['club'].save
-
+        when 'active'
+          data['club'].make_active
           stage_changed
+        when 'dormant'
+          msg_channel copy('activation_date.prompt')
+          :wait_for_activation_date
         end
       end
-      # rubocop:enable Metrics/AbcSize
 
-      # rubocop:disable Metrics/AbcSize
       def stage_changed
         reaction = copy("reaction.#{data['stage_name']}") ||
                    copy('reaction.else')
@@ -103,17 +98,13 @@ module Hackbot
                                           stage_name: data['stage_name'],
                                           reaction: reaction)
 
-        return unless data['stage_name'] == 'dormant'
-
-        msg_channel copy('activation_date.prompt')
-
-        :wait_for_activation_date
+        :finish
       end
-      # rubocop:enable Metrics/AbcSize
 
       def already_in_stage
         msg_channel copy('already_in_stage',
                          stage_name: data['club'].stage_name)
+        :finish
       end
 
       def not_found
