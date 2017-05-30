@@ -19,6 +19,11 @@ module Streakable
       end
     end
 
+    def stages
+      pipeline = StreakClient::Pipeline.find(pipeline_key)
+      pipeline[:stages]
+    end
+
     private
 
     def streak_pipeline_key(key)

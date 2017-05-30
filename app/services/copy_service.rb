@@ -8,15 +8,9 @@ class CopyService
   end
 
   def get_copy(key)
-    to_render = get_copy_file(key)
+    copy = recursive_render(yaml_from_key(key))
 
-    rendered = recursive_render to_render
-
-    if rendered.is_a?(String) || rendered.is_a?(Array)
-      rendered
-    else
-      HashWithIndifferentAccess.new(rendered)
-    end
+    copy.is_a?(Hash) ? HashWithIndifferentAccess.new(copy) : copy
   end
 
   def recursive_render(to_render)
@@ -30,11 +24,14 @@ class CopyService
     end
   end
 
-  def get_copy_file(key)
-    sections = key.split '.'
-    copy = get_interaction_yaml(@interaction_name)
+  def yaml_from_key(key)
+    yaml_path = File.join(Rails.root, 'lib', 'data', 'copy',
+                          "#{@interaction_name}.yml")
+    copy = YAML.load File.read(yaml_path)
 
-    sections.each { |s| copy = copy[s] }
+    key.split('.').each do |s|
+      copy = (copy.is_a?(Hash) && copy.key?(s) ? copy = copy[s] : nil)
+    end
 
     # If we get an array of strings, choose one element at random.
     array_of_strings?(copy) ? copy.sample : copy
@@ -54,16 +51,6 @@ class CopyService
     end
 
     all_strings
-  end
-
-  def get_interaction_yaml(name)
-    path = File.join(copy_route, "#{name}.yml")
-
-    YAML.load File.read(path)
-  end
-
-  def copy_route
-    Rails.root.join 'lib/data/copy/'
   end
 
   def hash_to_binding(hash)
