@@ -6,7 +6,9 @@ module V1
 
     def intake
       leader = Leader.new(
-        leader_params.merge(club_ids: [club_id], slack_team_id: TEAM_ID)
+        leader_params.merge(club_ids: [club_id],
+                            slack_username: slack_username,
+                            slack_team_id: TEAM_ID)
       )
 
       if leader.save
@@ -22,6 +24,10 @@ module V1
 
     def club_id
       params[:club_id]
+    end
+
+    def slack_username
+      params[:slack_username].strip
     end
 
     def verify_club_id
