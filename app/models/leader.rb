@@ -59,7 +59,8 @@ class Leader < ApplicationRecord
       .find_each { |c| c.update(point_of_contact: nil) }
   end
 
-  validates :name, :slack_id, presence: true
+  validates :name, presence: true
+  validate :validate_slack_username_found
 
   def slack_update
     return if access_token.nil?
@@ -79,6 +80,11 @@ class Leader < ApplicationRecord
   end
 
   private
+
+  def validate_slack_username_found
+    return unless user_from_username(slack_username).nil?
+    errors.add(:slack_username, 'Slack user not found')
+  end
 
   def slack_id_sync
     info = SlackClient::Users.info(slack_id, access_token)[:user]

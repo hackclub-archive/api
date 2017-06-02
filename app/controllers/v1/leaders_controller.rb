@@ -6,8 +6,7 @@ module V1
 
     def intake
       leader = Leader.new(
-        leader_params.merge(club_ids: [club_id],
-                            slack_username: slack_username,
+        leader_params.merge(club_ids: [club_id], slack_username: slack_username,
                             slack_team_id: TEAM_ID)
       )
 
