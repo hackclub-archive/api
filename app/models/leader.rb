@@ -59,7 +59,7 @@ class Leader < ApplicationRecord
       .find_each { |c| c.update(point_of_contact: nil) }
   end
 
-  validates :name, presence: true
+  validates :name, :slack_id, presence: true
 
   def slack_update
     return if access_token.nil?
