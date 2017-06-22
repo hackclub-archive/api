@@ -1,10 +1,6 @@
-# Hack Club's Code [![CircleCI](https://circleci.com/gh/hackclub/api.svg?style=shield)](https://circleci.com/gh/hackclub/api) [![Code Climate](https://codeclimate.com/github/hackclub/api/badges/gpa.svg)](https://codeclimate.com/github/hackclub/api) [![Test Coverage](https://codeclimate.com/github/hackclub/api/badges/coverage.svg)](https://codeclimate.com/github/hackclub/api/coverage) [![security](https://hakiri.io/github/hackclub/api/master.svg)](https://hakiri.io/github/hackclub/api/master)
+# Hack Club's Code [DEPRECATED] [![CircleCI](https://circleci.com/gh/hackclub/api.svg?style=shield)](https://circleci.com/gh/hackclub/api) [![Code Climate](https://codeclimate.com/github/hackclub/api/badges/gpa.svg)](https://codeclimate.com/github/hackclub/api) [![Test Coverage](https://codeclimate.com/github/hackclub/api/badges/coverage.svg)](https://codeclimate.com/github/hackclub/api/coverage) [![security](https://hakiri.io/github/hackclub/api/master.svg)](https://hakiri.io/github/hackclub/api/master)
 
-**Work in progress**
-
----
-
-Detailed README coming soon.
+__*Warning: This repository has been combined with [`hackclub/monolith`](https://github.com/hackclub/monolith)*__
 
 ## Setup
 
